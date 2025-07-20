@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AOE2 啟動器</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input {
+      font-size: 1.2em;
+      padding: 6px;
+      width: 100%;
+      max-width: 400px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 1em;
+      margin-top: 10px;
+    }
+    .links {
+      margin-top: 20px;
+    }
+    a {
+      display: block;
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Age of Empires 2 啟動器</h1>
+  <p>請輸入 AOE2 房間連結，例如：</p>
+  <code>aoe2de://0/123456</code> 或 <code>aoe2de://1/123456</code>
+  <br /><br />
+  <input type="text" id="aoeLinkInput" placeholder="aoe2de://0/123456" />
+  <button onclick="parseInput()">解析連結</button>
+
+  <div class="links" id="linkArea" style="display:none;">
+    <h2>解析結果：</h2>
+    <p id="modeDisplay"></p>
+    <a id="parsedLink" href="#">點此啟動</a>
+  </div>
+
+  <script>
+    function parseInput() {
+      const input = document.getElementById("aoeLinkInput").value.trim();
+      const match = input.match(/^aoe2de:\/\/(0|1)\/(\d+)$/);
+
+      if (!match) {
+        alert("請輸入有效格式：例如 aoe2de://0/123456");
+        return;
+      }
+
+      const mode = match[1] === "0" ? "加入遊戲" : "觀戰遊戲";
+      const url = `aoe2de://${match[1]}/${match[2]}`;
+
+      document.getElementById("modeDisplay").textContent = `這是 ${mode} 的連結：`;
+      document.getElementById("parsedLink").href = url;
+      document.getElementById("parsedLink").textContent = url;
+
+      document.getElementById("linkArea").style.display = "block";
+    }
+  </script>
+</body>
+</html>
