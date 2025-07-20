@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AOE2 啟動器</title>
+  <title>AOE2 連結轉換器</title>
   <style>
     body {
       font-family: sans-serif;
@@ -13,7 +13,7 @@
       font-size: 1.2em;
       padding: 6px;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
     }
     button {
       padding: 8px 16px;
@@ -22,45 +22,45 @@
     }
     .links {
       margin-top: 20px;
-    }
-    a {
-      display: block;
-      margin-top: 10px;
+      white-space: pre-wrap;
+      font-family: monospace;
       font-size: 1.1em;
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <h1>Age of Empires 2 啟動器</h1>
-  <p>請輸入 AOE2 房間連結，例如：</p>
-  <code>aoe2de://0/123456</code> 或 <code>aoe2de://1/123456</code>
-  <br /><br />
-  <input type="text" id="aoeLinkInput" placeholder="aoe2de://0/123456" />
-  <button onclick="parseInput()">解析連結</button>
+  <h1>Age of Empires 2 連結轉換器</h1>
+  <p>請輸入 aoe2de:// 開頭的連結，例如：</p>
+  <code>aoe2de://0/123456</code> 或 <code>aoe2de://1/123456</code><br><br>
 
-  <div class="links" id="linkArea" style="display:none;">
-    <h2>解析結果：</h2>
-    <p id="modeDisplay"></p>
-    <a id="parsedLink" href="#">點此啟動</a>
-  </div>
+  <input type="text" id="aoeLinkInput" placeholder="貼上 aoe2de:// 開頭的連結" />
+  <button onclick="generateTextLinks()">產生文字連結</button>
+
+  <div class="links" id="linkArea" style="display:none;"></div>
 
   <script>
-    function parseInput() {
+    function generateTextLinks() {
       const input = document.getElementById("aoeLinkInput").value.trim();
-      const match = input.match(/^aoe2de:\/\/(0|1)\/(\d+)$/);
+      const match = input.match(/^aoe2de:\/\/[01]\/(\d+)$/);
 
       if (!match) {
-        alert("請輸入有效格式：例如 aoe2de://0/123456");
+        alert("格式錯誤，請輸入像 aoe2de://0/123456 這樣的連結");
         return;
       }
 
-      const mode = match[1] === "0" ? "加入遊戲" : "觀戰遊戲";
-      const url = `aoe2de://${match[1]}/${match[2]}`;
+      const roomNumber = match[1];
 
-      document.getElementById("modeDisplay").textContent = `這是 ${mode} 的連結：`;
-      document.getElementById("parsedLink").href = url;
-      document.getElementById("parsedLink").textContent = url;
+      const joinUrl = `aoe2de://0/${roomNumber}`;
+      const spectateUrl = `aoe2de://1/${roomNumber}`;
 
+      const output = 
+        `入場連結：${joinUrl}\n` +
+        `觀戰連結：${spectateUrl}`;
+
+      document.getElementById("linkArea").textContent = output;
       document.getElementById("linkArea").style.display = "block";
     }
   </script>
