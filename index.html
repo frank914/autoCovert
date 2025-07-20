@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AOE2 房號連結轉換器</title>
+  <title>AOE2 房號連結轉換器與跳轉器</title>
   <style>
     body {
       font-family: sans-serif;
@@ -37,47 +37,27 @@
       color: #0645AD;
     }
   </style>
-</head>
-<body>
-  <h1>AOE2 房號連結轉換器</h1>
-  <p>請輸入 AOE2 協定連結（如 aoe2de://0/123456）：</p>
-
-  <input type="text" id="aoeLinkInput" placeholder="貼上 aoe2de://0/123456" />
-  <button onclick="generateWebLinks()">轉換成網頁連結</button>
-
-  <div class="links" id="linkArea" style="display:none;">
-    <strong>網頁跳轉連結：</strong>
-    <a id="joinLink" href="#" target="_blank"></a>
-    <a id="spectateLink" href="#" target="_blank"></a>
-  </div>
-
   <script>
-    function generateWebLinks() {
-      const input = document.getElementById("aoeLinkInput").value.trim();
-      const match = input.match(/^aoe2de:\/\/[01]\/(\d+)$/);
+    // 自動跳轉功能（網址含 ?number=123456&mode=join 或 mode=spectate 時）
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const number = params.get("number");
+      const mode = params.get("mode");
 
-      if (!match) {
-        alert("格式錯誤，請輸入 aoe2de://0/123456 這類格式");
-        return;
-      }
+      if (number && mode) {
+        let scheme = "";
 
-      const roomNumber = match[1];
-      const base = "https://frank914.github.io/autoCovert/";
+        if (mode === "join") {
+          scheme = `aoe2de://0/${number}`;
+        } else if (mode === "spectate") {
+          scheme = `aoe2de://1/${number}`;
+        }
 
-      const joinUrl = `${base}?number=${roomNumber}&mode=join`;
-      const spectateUrl = `${base}?number=${roomNumber}&mode=spectate`;
+        if (scheme) {
+          window.location.href = scheme;
 
-      const joinLink = document.getElementById("joinLink");
-      const spectateLink = document.getElementById("spectateLink");
-
-      joinLink.href = joinUrl;
-      joinLink.textContent = joinUrl;
-
-      spectateLink.href = spectateUrl;
-      spectateLink.textContent = spectateUrl;
-
-      document.getElementById("linkArea").style.display = "block";
-    }
-  </script>
-</body>
-</html>
+          // 額外提醒用戶手動點擊
+          setTimeout(() => {
+            alert("如果沒有自動開啟，請確認已安裝遊戲，或手動點擊產生的連結。");
+          }, 3000);
+        }
