@@ -3,113 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AOE2 房號連結轉換工具</title>
+  <title>AOE2 房號連結轉換器</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    input {
-      font-size: 1.2em;
-      padding: 6px;
-      width: 100%;
-      max-width: 500px;
-    }
-    button {
-      padding: 8px 16px;
-      font-size: 1em;
-      margin-top: 10px;
-    }
-    .links {
-      margin-top: 20px;
-      font-size: 1.1em;
-      padding: 10px;
-      border-radius: 6px;
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      font-family: monospace;
-      word-break: break-all;
-    }
-    a {
-      display: block;
-      margin: 5px 0;
-      text-decoration: underline;
-      color: #0645AD;
-    }
+    body{font-family:sans-serif;padding:20px;}
+    input{font-size:1.2em;padding:6px;width:100%;max-width:500px;}
+    button{padding:8px 16px;font-size:1em;margin-top:10px;}
+    .links{margin-top:20px;font-size:1.1em;padding:10px;border:1px solid #ddd;border-radius:6px;background:#f9f9f9;font-family:monospace;word-break:break-all;}
+    a{display:block;margin:5px 0;color:#0645AD;text-decoration:underline;}
   </style>
+  <script>
+    /* --- ① 讀取 ?number & ?mode 自動跳轉 --- */
+    window.addEventListener("load",() =>{
+      const p=new URLSearchParams(location.search);
+      const num=p.get("number");
+      let mode=p.get("mode")||"join";   // 沒帶 mode 就預設 join
+      if(num){
+        const scheme=(mode==="spectate")?`aoe2de://1/${num}`:`aoe2de://0/${num}`;
+        /* 用 <a>.click() 觸發，成功率比 location.href 高 */
+        const a=document.createElement("a");
+        a.href=scheme;
+        document.body.appendChild(a);
+        a.click();
+        /* 顯示手動連結備用 */
+        manualLink.href=scheme;
+        manualLink.textContent=scheme;
+        manualBox.style.display="block";
+        setTimeout(()=>alert("若未自動啟動，請手動點擊連結並確認 AoE2 已啟動過一次。"),3000);
+      }
+    });
+
+    /* --- ② 使用者貼上 aoe2de:// 產生兩種網頁連結 --- */
+    function generateLinks(){
+      const raw=document.getElementById("aoeInput").value.trim();
+      const m=raw.match(/^aoe2de:\/\/[01]\/(\d+)$/);
+      if(!m){alert("請輸入正確格式：aoe2de://0/123456");return;}
+      const id=m[1];
+      const base=location.origin+location.pathname.replace(/index\.html?$/,"");
+      joinLink.href=`${base}?number=${id}&mode=join`;
+      joinLink.textContent=joinLink.href;
+      specLink.href=`${base}?number=${id}&mode=spectate`;
+      specLink.textContent=specLink.href;
+      linkArea.style.display="block";
+    }
+  </script>
 </head>
 <body>
   <h1>AOE2 房號連結轉換器</h1>
-  <p>請輸入 AOE2 協定連結，例如：<code>aoe2de://0/406819336</code></p>
+  <p>貼上 <code>aoe2de://0/123456</code> 或 <code>aoe2de://1/123456</code>：</p>
 
-  <input type="text" id="aoeLinkInput" placeholder="貼上 aoe2de:// 開頭的連結" />
-  <button onclick="generateWebLinks()">轉換</button>
+  <input id="aoeInput" placeholder="aoe2de://0/123456" />
+  <button onclick="generateLinks()">轉換成網頁連結</button>
 
-  <div class="links" id="linkArea" style="display:none;">
+  <div id="linkArea" class="links" style="display:none;">
     <strong>自動跳轉網頁連結：</strong>
-    <a id="joinLink" href="#" target="_blank"></a>
-    <a id="spectateLink" href="#" target="_blank"></a>
+    <a id="joinLink" target="_blank"></a>
+    <a id="specLink" target="_blank"></a>
   </div>
 
-  <div class="links" id="manualLinkBox" style="display:none;">
-    <strong>⚠️ 若未自動開啟請手動點擊下方連結：</strong>
-    <a id="manualLink" href="#">點這裡啟動 AoE2</a>
+  <div id="manualBox" class="links" style="display:none;">
+    <strong>⚠ 若未自動開啟，手動點擊：</strong>
+    <a id="manualLink"></a>
   </div>
-
-  <script>
-    // 自動跳轉 aoe2de:// 協定
-    window.onload = function () {
-      const params = new URLSearchParams(window.location.search);
-      const number = params.get("number");
-      let mode = params.get("mode");
-
-      if (number) {
-        if (!mode) mode = "join";
-        const scheme = mode === "spectate" ? `aoe2de://1/${number}` : `aoe2de://0/${number}`;
-
-        // 自動點擊 a 連結以繞過瀏覽器限制
-        const a = document.createElement("a");
-        a.href = scheme;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-
-        // 顯示手動點擊備用
-        document.getElementById("manualLink").href = scheme;
-        document.getElementById("manualLink").textContent = scheme;
-        document.getElementById("manualLinkBox").style.display = "block";
-
-        // 提醒
-        setTimeout(() => {
-          alert("如果沒有自動啟動，請確認已安裝遊戲，或點擊畫面上的連結。");
-        }, 3000);
-      }
-    }
-
-    // 解析使用者輸入 aoe2de:// 產生跳轉網址
-    function generateWebLinks() {
-      const input = document.getElementById("aoeLinkInput").value.trim();
-      const match = input.match(/^aoe2de:\/\/[01]\/(\d+)$/);
-
-      if (!match) {
-        alert("請輸入格式正確的 AOE2 連結，如 aoe2de://0/123456");
-        return;
-      }
-
-      const roomNumber = match[1];
-      const base = window.location.origin + window.location.pathname;
-
-      const joinUrl = `${base}?number=${roomNumber}&mode=join`;
-      const spectateUrl = `${base}?number=${roomNumber}&mode=spectate`;
-
-      document.getElementById("joinLink").href = joinUrl;
-      document.getElementById("joinLink").textContent = joinUrl;
-
-      document.getElementById("spectateLink").href = spectateUrl;
-      document.getElementById("spectateLink").textContent = spectateUrl;
-
-      document.getElementById("linkArea").style.display = "block";
-    }
-  </script>
 </body>
 </html>
