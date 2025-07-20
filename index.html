@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AOE2 連結轉換器</title>
+  <title>AOE2 房號連結轉換器</title>
   <style>
     body {
       font-family: sans-serif;
@@ -22,45 +22,60 @@
     }
     .links {
       margin-top: 20px;
-      white-space: pre-wrap;
-      font-family: monospace;
       font-size: 1.1em;
-      background: #f5f5f5;
       padding: 10px;
       border-radius: 6px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      font-family: monospace;
+      word-break: break-all;
+    }
+    a {
+      display: block;
+      margin: 5px 0;
+      text-decoration: underline;
+      color: #0645AD;
     }
   </style>
 </head>
 <body>
-  <h1>Age of Empires 2 連結轉換器</h1>
-  <p>請輸入 aoe2de:// 開頭的連結，例如：</p>
-  <code>aoe2de://0/123456</code> 或 <code>aoe2de://1/123456</code><br><br>
+  <h1>AOE2 房號連結轉換器</h1>
+  <p>請輸入 AOE2 協定連結（如 aoe2de://0/123456）：</p>
 
-  <input type="text" id="aoeLinkInput" placeholder="貼上 aoe2de:// 開頭的連結" />
-  <button onclick="generateTextLinks()">產生文字連結</button>
+  <input type="text" id="aoeLinkInput" placeholder="貼上 aoe2de://0/123456" />
+  <button onclick="generateWebLinks()">轉換成網頁連結</button>
 
-  <div class="links" id="linkArea" style="display:none;"></div>
+  <div class="links" id="linkArea" style="display:none;">
+    <strong>網頁跳轉連結：</strong>
+    <a id="joinLink" href="#" target="_blank"></a>
+    <a id="spectateLink" href="#" target="_blank"></a>
+  </div>
 
   <script>
-    function generateTextLinks() {
+    function generateWebLinks() {
       const input = document.getElementById("aoeLinkInput").value.trim();
       const match = input.match(/^aoe2de:\/\/[01]\/(\d+)$/);
 
       if (!match) {
-        alert("格式錯誤，請輸入像 aoe2de://0/123456 這樣的連結");
+        alert("格式錯誤，請輸入 aoe2de://0/123456 這類格式");
         return;
       }
 
       const roomNumber = match[1];
+      const base = "https://frank914.github.io/autoCovert/";
 
-      const joinUrl = `aoe2de://0/${roomNumber}`;
-      const spectateUrl = `aoe2de://1/${roomNumber}`;
+      const joinUrl = `${base}?number=${roomNumber}&mode=join`;
+      const spectateUrl = `${base}?number=${roomNumber}&mode=spectate`;
 
-      const output = 
-        `入場連結：${joinUrl}\n` +
-        `觀戰連結：${spectateUrl}`;
+      const joinLink = document.getElementById("joinLink");
+      const spectateLink = document.getElementById("spectateLink");
 
-      document.getElementById("linkArea").textContent = output;
+      joinLink.href = joinUrl;
+      joinLink.textContent = joinUrl;
+
+      spectateLink.href = spectateUrl;
+      spectateLink.textContent = spectateUrl;
+
       document.getElementById("linkArea").style.display = "block";
     }
   </script>
